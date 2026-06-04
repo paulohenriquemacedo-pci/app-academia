@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
+import { Route as AuthenticatedOnboardingResultRouteImport } from './routes/_authenticated/onboarding.result'
 import { Route as AuthenticatedOnboardingEnergyRouteImport } from './routes/_authenticated/onboarding.energy'
 import { Route as AuthenticatedAppWeeklyRouteImport } from './routes/_authenticated/_app.weekly'
 import { Route as AuthenticatedAppSessionsRouteImport } from './routes/_authenticated/_app.sessions'
@@ -43,6 +44,12 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/_app',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedOnboardingResultRoute =
+  AuthenticatedOnboardingResultRouteImport.update({
+    id: '/result',
+    path: '/result',
+    getParentRoute: () => AuthenticatedOnboardingRoute,
+  } as any)
 const AuthenticatedOnboardingEnergyRoute =
   AuthenticatedOnboardingEnergyRouteImport.update({
     id: '/energy',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof AuthenticatedAppSessionsRoute
   '/weekly': typeof AuthenticatedAppWeeklyRoute
   '/onboarding/energy': typeof AuthenticatedOnboardingEnergyRoute
+  '/onboarding/result': typeof AuthenticatedOnboardingResultRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/sessions': typeof AuthenticatedAppSessionsRoute
   '/weekly': typeof AuthenticatedAppWeeklyRoute
   '/onboarding/energy': typeof AuthenticatedOnboardingEnergyRoute
+  '/onboarding/result': typeof AuthenticatedOnboardingResultRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +113,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/sessions': typeof AuthenticatedAppSessionsRoute
   '/_authenticated/_app/weekly': typeof AuthenticatedAppWeeklyRoute
   '/_authenticated/onboarding/energy': typeof AuthenticatedOnboardingEnergyRoute
+  '/_authenticated/onboarding/result': typeof AuthenticatedOnboardingResultRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/weekly'
     | '/onboarding/energy'
+    | '/onboarding/result'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/weekly'
     | '/onboarding/energy'
+    | '/onboarding/result'
   id:
     | '__root__'
     | '/'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/sessions'
     | '/_authenticated/_app/weekly'
     | '/_authenticated/onboarding/energy'
+    | '/_authenticated/onboarding/result'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/onboarding/result': {
+      id: '/_authenticated/onboarding/result'
+      path: '/result'
+      fullPath: '/onboarding/result'
+      preLoaderRoute: typeof AuthenticatedOnboardingResultRouteImport
+      parentRoute: typeof AuthenticatedOnboardingRoute
     }
     '/_authenticated/onboarding/energy': {
       id: '/_authenticated/onboarding/energy'
@@ -240,11 +260,13 @@ const AuthenticatedAppRouteWithChildren =
 
 interface AuthenticatedOnboardingRouteChildren {
   AuthenticatedOnboardingEnergyRoute: typeof AuthenticatedOnboardingEnergyRoute
+  AuthenticatedOnboardingResultRoute: typeof AuthenticatedOnboardingResultRoute
 }
 
 const AuthenticatedOnboardingRouteChildren: AuthenticatedOnboardingRouteChildren =
   {
     AuthenticatedOnboardingEnergyRoute: AuthenticatedOnboardingEnergyRoute,
+    AuthenticatedOnboardingResultRoute: AuthenticatedOnboardingResultRoute,
   }
 
 const AuthenticatedOnboardingRouteWithChildren =
