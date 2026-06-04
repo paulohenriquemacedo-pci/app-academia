@@ -127,6 +127,57 @@ export const PROFILE_LABEL: Record<ProfileKey, string> = {
   sobrecarregado_sistemico: "Sobrecarregado Sistêmico",
 };
 
+export const PROFILE_SHORT_LABEL: Record<ProfileKey, string> = {
+  perfeccionista_paralisado: "Perfeccionista",
+  multitarefa_caotico: "Multitarefa",
+  procrastinador_criativo: "Procrastinador",
+  analista_perpetuo: "Analista",
+  dependente_motivacao: "Dependente",
+  sobrecarregado_sistemico: "Sobrecarregado",
+};
+
+export const PROFILE_META: Record<
+  ProfileKey,
+  { description: string; protocol: string }
+> = {
+  perfeccionista_paralisado: {
+    description:
+      "Você refina mais do que produz. O loop de revisão está substituindo o avanço real.",
+    protocol:
+      "O app vai priorizar registro de output bruto e separação rígida entre fases de escrita e revisão.",
+  },
+  multitarefa_caotico: {
+    description:
+      "Você começa muito e conclui pouco. Movimento está sendo confundido com progresso.",
+    protocol:
+      "O app vai implementar o CEO da Semana — um projeto prioritário por vez, com foco monitorado.",
+  },
+  procrastinador_criativo: {
+    description:
+      "Você opera em ciclos de adrenalina. O padrão é insustentável em projetos de 2 a 6 anos.",
+    protocol:
+      "O app vai estruturar Sprints Acadêmicos com mini-deadlines que simulam urgência de forma controlada.",
+  },
+  analista_perpetuo: {
+    description:
+      "Você pesquisa como proteção contra o julgamento. A coleta infinita está substituindo a escrita.",
+    protocol:
+      "O app vai aplicar a Regra dos 3 Artigos e monitorar a proporção leitura/escrita nas sessões.",
+  },
+  dependente_motivacao: {
+    description:
+      "Sua produtividade está atrelada ao estado emocional do dia. Sistema substitui motivação.",
+    protocol:
+      "O app vai criar rituais fixos e blocos de trabalho independentes de como você está se sentindo.",
+  },
+  sobrecarregado_sistemico: {
+    description:
+      "Sua agenda pertence aos outros. As Horas de Ouro estão sendo consumidas por urgências externas.",
+    protocol:
+      "O app vai proteger blocos de trabalho focado e tornar visível o custo do que você aceita.",
+  },
+};
+
 export type SectionScores = Record<ProfileKey, number>;
 
 export function computeResult(scores: SectionScores) {
