@@ -142,15 +142,24 @@ function OnboardingPage() {
         onboarding_step: "energy_tracking",
       };
 
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from("user_profiles")
-        .upsert(payload, { onConflict: "user_id" });
+        .upsert(payload, { onConflict: "user_id" })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("[onboarding] upsert error", error, "payload:", payload);
+        const details = [error.message, error.details, error.hint, error.code]
+          .filter(Boolean)
+          .join(" — ");
+        throw new Error(details || "Erro desconhecido");
+      }
+      console.log("[onboarding] upsert ok", data);
 
       navigate({ to: "/onboarding/result", replace: true });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro ao salvar respostas";
+      console.error("[onboarding] save failed:", err);
       setSubmitError(msg);
       setSubmitting(false);
     }
