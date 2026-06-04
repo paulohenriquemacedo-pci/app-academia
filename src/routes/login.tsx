@@ -14,10 +14,12 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -26,14 +28,39 @@ function LoginPage() {
     });
   }, [loading, user, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
+    if (password.length < 6) {
+      setError("A senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setSubmitting(false);
-    if (error) {
-      setError(traduzirErro(error.message));
+    if (mode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      setSubmitting(false);
+      if (error) {
+        setError(traduzirErro(error.message));
+        return;
+      }
+      if (!data.session) {
+        // Confirmação de e-mail está ativa no projeto Supabase — tenta login direto.
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) {
+          setInfo("Cadastro criado. Verifique seu e-mail ou desative a confirmação no Supabase.");
+        }
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setSubmitting(false);
+      if (error) {
+        setError(traduzirErro(error.message));
+      }
     }
   };
 
@@ -69,7 +96,7 @@ function LoginPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">E-mail</Label>
             <Input
@@ -86,8 +113,9 @@ function LoginPage() {
             <Input
               id="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
               required
+              minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -97,14 +125,40 @@ function LoginPage() {
               {error}
             </p>
           )}
+          {info && (
+            <p className="text-sm text-muted-foreground" role="status">
+              {info}
+            </p>
+          )}
           <Button
             type="submit"
             className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
             disabled={submitting}
           >
-            {submitting ? "Entrando…" : "Entrar"}
+            {submitting
+              ? mode === "signup"
+                ? "Criando conta…"
+                : "Entrando…"
+              : mode === "signup"
+                ? "Criar conta"
+                : "Entrar"}
           </Button>
         </form>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          {mode === "signin" ? "Ainda não tem conta?" : "Já tem conta?"}{" "}
+          <button
+            type="button"
+            className="font-semibold text-primary hover:underline"
+            onClick={() => {
+              setMode((m) => (m === "signin" ? "signup" : "signin"));
+              setError(null);
+              setInfo(null);
+            }}
+          >
+            {mode === "signin" ? "Criar cadastro" : "Entrar"}
+          </button>
+        </p>
       </div>
     </div>
   );
@@ -113,5 +167,7 @@ function LoginPage() {
 function traduzirErro(msg: string) {
   if (/invalid login credentials/i.test(msg)) return "E-mail ou senha incorretos.";
   if (/email not confirmed/i.test(msg)) return "Confirme seu e-mail antes de entrar.";
+  if (/user already registered/i.test(msg)) return "Este e-mail já está cadastrado.";
+  if (/password.*at least/i.test(msg)) return "A senha deve ter pelo menos 6 caracteres.";
   return msg;
 }
